@@ -1,0 +1,72 @@
+﻿@page "/logregistry"
+@attribute [Authorize]
+@using EliteInsider.Models
+@using EliteInsider.Data
+@inject IRaidLogService RLService
+
+<PageTitle>Log Registry</PageTitle>
+
+<h1>Log Registry</h1>
+
+<p>This page shows all uploaded and parsed logs that are registered in the database.</p>
+
+<MudTable Items="@RaidKillTimes" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<RaidKillTime, bool>(FilterFunc1)" @bind-SelectedItem="selectedItem1">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Raid Kill-Times</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Encounter Name</MudTh>
+        <MudTh>Qualifying Date</MudTh>
+        <MudTh>Start Time</MudTh>
+        <MudTh>End Time</MudTh>
+        <MudTh>Kill-Duration in Seconds</MudTh>
+        <MudTh>Success?</MudTh>
+        <MudTh>CM?</MudTh>
+        <MudTh>Link to Log</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Nr">@context.EncounterName</MudTd>
+        <MudTd DataLabel="Sign">@context.QualifyingDate</MudTd>
+        <MudTd DataLabel="Name">@context.StartTime</MudTd>
+        <MudTd DataLabel="Position">@context.EndTime</MudTd>
+        <MudTd DataLabel="Molar mass">@context.KillDurationSeconds</MudTd>
+        <MudTd DataLabel="Molar mass">@context.Success</MudTd>
+        <MudTd DataLabel="Molar mass">@context.CM</MudTd>
+        <MudTd DataLabel="Molar mass"><a target="_blank" href="@context.LinkToUpload">@context.LinkToUpload</a></MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+
+@code {
+    private bool dense = false;
+    private bool hover = true;
+    private bool striped = false;
+    private bool bordered = false;
+    private string searchString1 = "";
+    private RaidKillTime selectedItem1 = null;
+    private HashSet<RaidKillTime> selectedItems = new HashSet<RaidKillTime>();
+
+    private IEnumerable<RaidKillTime> RaidKillTimes = new List<RaidKillTime>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        RaidKillTimes = await RLService.GetRaidKillTimesAsync();
+    }
+
+    private bool FilterFunc1(RaidKillTime rkt) => FilterFunc(rkt, searchString1);
+
+    private bool FilterFunc(RaidKillTime rkt, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (rkt.EncounterName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (rkt.QualifyingDate.ToString().Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+}

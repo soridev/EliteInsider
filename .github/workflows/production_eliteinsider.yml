@@ -32,7 +32,7 @@ jobs:
         run: dotnet tool install -g dotnet-ef
       
       - name: dotnet bundle migration
-        run: dotnet ef migrations bundle -v -p EliteInsider/EliteInsider.csproj -o ${{env.DOTNET_ROOT}}/myapp/migrate -r linux-x64 --no-build
+        run: dotnet ef migrations bundle -v -p EliteInsider/EliteInsider.csproj -o ${{env.DOTNET_ROOT}}/EliteInsider/migrate -r linux-x64 --no-build
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v2

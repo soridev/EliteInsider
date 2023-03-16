@@ -22,6 +22,147 @@ namespace EliteInsider.Data.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("EliteInsider.Models.PlayerInfo", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AccountName")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("account_name");
+
+                    b.Property<string>("CharacterName")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("character_name");
+
+                    b.Property<bool>("Died")
+                        .HasColumnType("boolean")
+                        .HasColumnName("died");
+
+                    b.Property<int>("Downstates")
+                        .HasColumnType("integer")
+                        .HasColumnName("downstates");
+
+                    b.Property<string>("LogId")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("log_id");
+
+                    b.Property<string>("Profession")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("profession");
+
+                    b.Property<int>("TargetDps")
+                        .HasColumnType("integer")
+                        .HasColumnName("target_dps");
+
+                    b.Property<int>("TotalCC")
+                        .HasColumnType("integer")
+                        .HasColumnName("total_cc");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("player_info", "public");
+                });
+
+            modelBuilder.Entity("EliteInsider.Models.RaidEncounter", b =>
+                {
+                    b.Property<string>("EncounterName")
+                        .HasColumnType("text")
+                        .HasColumnName("encounter_name");
+
+                    b.Property<string>("ArcFolderName")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("arc_folder_name");
+
+                    b.Property<int>("BossPosition")
+                        .HasColumnType("integer")
+                        .HasColumnName("boss_position");
+
+                    b.Property<bool>("HasCM")
+                        .HasColumnType("boolean")
+                        .HasColumnName("has_cm");
+
+                    b.Property<int>("RaidWing")
+                        .HasColumnType("integer")
+                        .HasColumnName("raid_wing");
+
+                    b.Property<bool>("RelevantBoss")
+                        .HasColumnType("boolean")
+                        .HasColumnName("relevant_boss");
+
+                    b.Property<string>("WingName")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("wing_name");
+
+                    b.HasKey("EncounterName");
+
+                    b.ToTable("raid_encounters", "public");
+                });
+
+            modelBuilder.Entity("EliteInsider.Models.RaidKillTime", b =>
+                {
+                    b.Property<string>("LogId")
+                        .HasColumnType("text")
+                        .HasColumnName("log_id");
+
+                    b.Property<bool>("CM")
+                        .HasColumnType("boolean")
+                        .HasColumnName("cm");
+
+                    b.Property<string>("EncounterName")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("encounter_name");
+
+                    b.Property<DateTime>("EndTime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("end_time");
+
+                    b.Property<string>("InputFile")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("input_file");
+
+                    b.Property<double>("KillDurationSeconds")
+                        .HasColumnType("double precision")
+                        .HasColumnName("kill_duration_seconds");
+
+                    b.Property<string>("LinkToUpload")
+                        .HasColumnType("text")
+                        .HasColumnName("link_to_upload");
+
+                    b.Property<DateOnly>("QualifyingDate")
+                        .HasColumnType("date")
+                        .HasColumnName("qualifying_date");
+
+                    b.Property<DateTime>("StartTime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("start_time");
+
+                    b.Property<bool>("Success")
+                        .HasColumnType("boolean")
+                        .HasColumnName("success");
+
+                    b.Property<string>("UploadedBy")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("uploaded_by");
+
+                    b.HasKey("LogId");
+
+                    b.ToTable("raid_kill_times", "public");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")

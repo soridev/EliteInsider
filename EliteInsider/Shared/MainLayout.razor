@@ -1,20 +1,31 @@
 ﻿@inherits LayoutComponentBase
+@inject NavigationManager UriHelper
 
-<PageTitle>EliteInsider</PageTitle>
-
-<div class="page">
-    <div class="sidebar">
+<MudLayout>
+    <MudAppBar>
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+        <MudText onclick="TitleIconClick()" Typo="Typo.h5" Class="ml-3">Elite Insider</MudText>
+        <MudSpacer />
+        <LoginDisplay/>
+    </MudAppBar>
+    <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
         <NavMenu />
-    </div>
+    </MudDrawer>
+    <MudMainContent class="content px-6 mt-3">
+        @Body
+    </MudMainContent>
+</MudLayout>
 
-    <main>
-        <div class="top-row px-4 auth">
-            <LoginDisplay />
-            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
-        </div>
+@code {
+    bool _drawerOpen = true;
 
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
-</div>
+    void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+
+    void TitleIconClick()
+    {
+        UriHelper.NavigateTo("/");
+    }
+}

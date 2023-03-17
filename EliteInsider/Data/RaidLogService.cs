@@ -17,7 +17,8 @@ namespace EliteInsider.Data
         {
             try
             {
-                return await _context.RaidKillTimes.ToListAsync();
+                var rkt = await _context.RaidKillTimes.ToListAsync();
+                return rkt.OrderByDescending(x => x.StartTime).ToList();
             }
             catch (Exception ex)
             {

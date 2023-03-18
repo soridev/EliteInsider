@@ -2,11 +2,12 @@
 @attribute [Authorize]
 @using System.IO
 @using EliteInsider.Models
-@using EliteInsider.Controllers
+@using EliteInsider.Data
 
 @inject ISnackbar Snackbar
 @inject ILogger<Upload> Logger
 @inject IWebHostEnvironment Environment
+@inject IUploadService UploadService
 
 <PageTitle>Log Upload</PageTitle>
 
@@ -81,8 +82,14 @@
                 var trustedFileName = file.Name;
                 var path = Path.Combine(Environment.ContentRootPath, "Filestore", trustedFileName);
 
-                await using FileStream fs = new(path, FileMode.Create);
-                await file.OpenReadStream(maxFileSize).CopyToAsync(fs);
+                // filestream cant be awaited aswell else we lock the file.
+                using (FileStream fs = new(path, FileMode.Create))
+                {
+                    await file.OpenReadStream(maxFileSize).CopyToAsync(fs);
+                }
+
+                // after uploading the file to the elite-insider server we upload it to dps.report and fetch the json data.
+                await UploadService.RegisterNewFile(path);
             }
             catch(Exception ex)
             {

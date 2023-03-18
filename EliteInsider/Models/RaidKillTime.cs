@@ -23,11 +23,7 @@ namespace EliteInsider.Models
         public bool Success { get; set; }
         [Column("cm")]
         public bool CM { get; set; }
-        [Column("input_file")]
-        public string InputFile { get; set; }
         [Column("link_to_upload")]
         public string? LinkToUpload { get; set; }
-        [Column("uploaded_by")]
-        public string UploadedBy { get; set; }
     }
 }

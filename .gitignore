@@ -478,3 +478,8 @@ $RECYCLE.BIN/
 
 # startup json's
 appsettings.Production.json
+
+# application filestore
+*.evtc
+*.zevtc
+*.evtc.zip

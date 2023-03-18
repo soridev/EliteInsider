@@ -1,0 +1,23 @@
+﻿@page "/fullclears"
+@attribute [Authorize]
+
+@using EliteInsider.Models
+@using EliteInsider.Data
+
+<PageTitle>Fullclears</PageTitle>
+
+<h1>Fullclears</h1>
+
+<p>This page lets you inspect data about the guilds fullclears</p>
+
+<MudGrid>
+    <MudItem xs="2">
+        <MudSelect T="string" Label="Week and Year" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+            <MudSelectItem T="string" Value="@("test")"></MudSelectItem>
+        </MudSelect>
+    </MudItem>
+</MudGrid>
+
+@code {
+
+}

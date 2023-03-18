@@ -1,0 +1,124 @@
+﻿@page "/upload"
+@attribute [Authorize]
+@using System.IO
+@using EliteInsider.Models
+@using EliteInsider.Controllers
+
+@inject ISnackbar Snackbar
+@inject ILogger<Upload> Logger
+@inject IWebHostEnvironment Environment
+
+<PageTitle>Log Upload</PageTitle>
+
+<h1>Upload Logs</h1>
+
+<p>This page lets you upload you arcdps logfiles to register them on <MudLink Target="_blank" Href="https://dps.report">dps.report</MudLink> and in the Elite Insider backend.</p>
+
+<MudAlert hidden="@alertHidden" Severity="@alertSeverity" id="upload-alert" ShowCloseIcon="true" CloseIconClicked="HideAlert">@alertText</MudAlert>
+
+<MudStack Style="width: 100%">
+    <MudFileUpload T="IReadOnlyList<IBrowserFile>" OnFilesChanged="OnInputFileChanged" Hidden="false" Class="flex-1" InputClass="absolute mud-width-full mud-height-full overflow-hidden z-20" InputStyle="opacity:0"
+                   @ondragenter="@SetDragClass" @ondragleave="@ClearDragClass" @ondragend="@ClearDragClass">
+        <ButtonTemplate>
+            <MudPaper Height="300px" Outlined="true" Class="@DragClass">
+                <MudText Typo="Typo.h6">Drag and drop files here or click</MudText>
+                @foreach (var file in fileNames)
+                {
+                    <MudChip Color="Color.Dark" Text="@file" />
+                }
+            </MudPaper>
+        </ButtonTemplate>
+    </MudFileUpload>
+    <MudToolBar DisableGutters="true" Class="gap-4">
+        <MudButton OnClick="UploadFiles" Disabled="@(!fileNames.Any())" Color="Color.Primary" Variant="Variant.Filled">Upload</MudButton>
+        <MudButton OnClick="Clear" Disabled="@(!fileNames.Any())" Color="Color.Error" Variant="Variant.Filled">Clear</MudButton>
+    </MudToolBar>
+</MudStack>
+@code {
+    private long maxFileSize = 15000000; // set max filesize to 15MB.
+    private bool alertHidden = true;
+    private Severity alertSeverity = Severity.Success;
+    private string alertText = string.Empty;
+    private static string DefaultDragClass = "relative rounded-lg border-2 border-dashed pa-4 mt-4 mud-width-full mud-height-full z-10";
+    private string DragClass = DefaultDragClass;
+    private List<string> fileNames = new List<string>();
+    private IReadOnlyList<IBrowserFile> uploadFileList = new List<IBrowserFile>();
+
+    private void OnInputFileChanged(InputFileChangeEventArgs e)
+    {
+        ClearDragClass();
+        uploadFileList = e.GetMultipleFiles();
+        foreach (var file in uploadFileList)
+        {
+            fileNames.Add(file.Name);
+        }
+    }
+
+    private void HideAlert()
+    {
+        alertHidden = true;
+    }
+
+    private async Task Clear()
+    {
+        fileNames.Clear();
+        uploadFileList = new List<IBrowserFile>();
+        ClearDragClass();
+        await Task.Delay(100);
+    }
+    private async Task UploadFiles()
+    {
+        //Upload the files here
+        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+        Snackbar.Add("Starting File Upload.", Severity.Info);
+        string alertErrorText = string.Empty;
+
+
+        foreach(var file in uploadFileList)
+        {
+            try
+            {
+                var trustedFileName = file.Name;
+                var path = Path.Combine(Environment.ContentRootPath, "Filestore", trustedFileName);
+
+                await using FileStream fs = new(path, FileMode.Create);
+                await file.OpenReadStream(maxFileSize).CopyToAsync(fs);
+            }
+            catch(Exception ex)
+            {
+                string faultyFilePath = Path.Combine(Environment.ContentRootPath, "Filestore", file.Name);
+                if (File.Exists(faultyFilePath))
+                {
+                    File.Delete(faultyFilePath);
+                }
+
+                Logger.LogError($"Unable to upload file {file.Name}: {ex.Message}");
+                alertErrorText = alertErrorText + $"Unable to upload file {file.Name}: {ex.Message}\n";
+            }
+        }
+
+        // file upload done, show result.
+        if (string.IsNullOrEmpty(alertErrorText))
+        {
+            alertText = $"Successfuly uploaded {uploadFileList.Count} files.";
+            alertSeverity = Severity.Success;
+        }
+        else
+        {
+            alertText = alertErrorText;
+            alertSeverity = Severity.Error;
+        }
+
+        alertHidden = false;
+    }
+
+    private void SetDragClass()
+    {
+        DragClass = $"{DefaultDragClass} mud-border-primary";
+    }
+
+    private void ClearDragClass()
+    {
+        DragClass = DefaultDragClass;
+    }
+}

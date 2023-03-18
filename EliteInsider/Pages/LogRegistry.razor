@@ -26,7 +26,7 @@
         <PropertyColumn Property="x => x.EndTime" Title="End Time"/>
         <PropertyColumn Property="x => x.Success" Title="Success?" Sortable="true" Filterable="true" />
         <PropertyColumn Property="x => x.CM" Title="CM?" Sortable="true" Filterable="true" />
-        <TemplateColumn>
+        <TemplateColumn Filterable="false" Sortable="false">
             <CellTemplate>
                 <MudLink Target="_blank" Href="@context.Item.LinkToUpload">@context.Item.LinkToUpload</MudLink>
             </CellTemplate>

@@ -31,13 +31,6 @@
         public long powerDps { get; set; }
         public long powerDamage { get; set; }
         public double breakbarDamage { get; set; }
-        public long actorDps { get; set; }
-        public long actorDamage { get; set; }
-        public long actorCondiDps { get; set; }
-        public long actorCondiDamage { get;set; }
-        public long actorPowerDps { get; set; }
-        public long actorPowerDamage { get; set;}
-        public double actorBreakbarDamage { get; set; }
     }
 
     public class DpsReportMechanic

@@ -1,8 +1,13 @@
 ﻿@page "/fullclears"
 @attribute [Authorize]
 
-@using EliteInsider.Models
-@using EliteInsider.Data
+@using EliteInsider.Models;
+@using EliteInsider.Models.Converters;
+@using EliteInsider.Data;
+@using Plotly.Blazor.Traces.ScatterLib;
+@using Plotly.Blazor.LayoutLib;
+
+@inject IRaidLogService LogService;
 
 <PageTitle>Fullclears</PageTitle>
 
@@ -11,13 +16,89 @@
 <p>This page lets you inspect data about the guilds fullclears</p>
 
 <MudGrid>
+    <MudItem xs="3">
+        <MudAutocomplete T="GuildWeek" Label="Week and Year" @bind-Value="currentValue" SearchFunc="@Search1"
+                         CoerceText="@coerceText" CoerceValue="@coerceValue" MaxItems="null" ResetValueOnEmptyText="true"/>
+    </MudItem>
     <MudItem xs="2">
-        <MudSelect T="string" Label="Week and Year" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-            <MudSelectItem T="string" Value="@("test")"></MudSelectItem>
-        </MudSelect>
+        <MudButton Variant="Variant.Filled" ButtonType="ButtonType.Button" Color="@Color.Primary" OnClick="UpdateChartClick">Update Charts</MudButton>
+    </MudItem>
+    <MudItem xs="12">
+        <PlotlyChart @bind-Config="fcLineconfig" @bind-Layout="fcLinelayout" @bind-Data="fcLineData" @ref="fcLineChart"/>
     </MudItem>
 </MudGrid>
 
 @code {
+    // dropdown config
+    private bool resetValueOnEmptyText;
+    private bool coerceText;
+    private bool coerceValue;
+    private GuildWeek currentValue;
+    private List<GuildWeek> guildWeeks = new List<GuildWeek>();
 
+    // plotly chart config
+    PlotlyChart fcLineChart;
+    Config fcLineconfig = new Config() { Responsive = true };
+    Layout fcLinelayout = new Layout() {  };
+    IList<ITrace> fcLineData = new List<ITrace>();
+
+    // fullclear data
+    List<GuildKillTime> gkts = new List<GuildKillTime>();
+
+    // load guild-weeks from backend service.
+    protected override async Task OnInitializedAsync()
+    {
+        guildWeeks = await LogService.GetGuildClearWeeksAsync("ZETA");
+    }
+
+    // generic search function.
+    private async Task<IEnumerable<GuildWeek>> Search1(string value)
+    {
+        // In real life use an asynchronous function for fetching data from an api.
+        await Task.Delay(5);
+
+        // if text is null or empty, show complete list
+        if (string.IsNullOrEmpty(value))
+            return guildWeeks;
+        return guildWeeks.Where(x => x.YearWeek.ToString().Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+
+    private async Task UpdateChartClick()
+    {
+        if(currentValue != null)
+        {
+            await FetchFullclearData(currentValue);
+            await refreshGraphs();
+        }
+    }
+
+    public async Task FetchFullclearData(GuildWeek guildweek)
+    {
+        gkts = await LogService.GetFullclearDataAsync(guildweek);
+    }
+
+    public async Task refreshGraphs()
+    {
+        // prepare the layout for the scatter chart.
+        Layout newLayout = new Layout();
+        newLayout.XAxis = new List<XAxis>() { new XAxis() {  } };
+        newLayout.YAxis = new List<YAxis>() { new YAxis() { ShowTickLabels = false } };
+
+        // prepare the data for the scatter chart.
+        IList<ITrace> data = new List<ITrace>();
+
+        foreach(var item in gkts)
+        {
+            data.Add(new Scatter{
+                    Name = item.EncounterName,
+                    Mode = ModeFlag.Lines,
+                    X = new List<object>(){item.StartTime.ToString(), item.EndTime.ToString()},
+                    Y = new List<object>() { 10, 10 }
+            });
+        }
+
+        fcLinelayout = newLayout;
+        fcLineData = data;
+        await fcLineChart.Update();
+    }
 }

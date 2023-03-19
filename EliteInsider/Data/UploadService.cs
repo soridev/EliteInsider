@@ -69,7 +69,8 @@ namespace EliteInsider.Data
             }
             catch (Exception ex)
             {
-                throw ex;
+                
+                throw ex.InnerException;
             }
         }
 
@@ -95,7 +96,7 @@ namespace EliteInsider.Data
             }
             catch (Exception ex)
             {
-                throw ex;
+                throw ex.InnerException;
             }
         }
 
@@ -136,8 +137,16 @@ namespace EliteInsider.Data
                 rkt.CM = jsonData.isCM;
                 rkt.LinkToUpload = linkToUpload;
 
-                await _context.AddAsync(rkt);
-                await _context.SaveChangesAsync();
+                try
+                {
+                    _context.Add(rkt);
+                    _context.SaveChanges();
+                }
+                catch(Exception entityError)
+                {
+                    _context.Remove(rkt);
+                    throw entityError.InnerException;
+                }
             }
             catch (Exception ex)
             {

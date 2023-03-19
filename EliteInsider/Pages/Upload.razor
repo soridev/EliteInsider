@@ -18,6 +18,7 @@
 <MudAlert hidden="@alertHidden" Severity="@alertSeverity" id="upload-alert" ShowCloseIcon="true" CloseIconClicked="HideAlert">@alertText</MudAlert>
 
 <MudStack Style="width: 100%">
+    <MudProgressLinear Color="Color.Primary" Size="Size.Large" Value="100" Striped="true" hidden="@progressHidden"></MudProgressLinear>
     <MudFileUpload T="IReadOnlyList<IBrowserFile>" OnFilesChanged="OnInputFileChanged" Hidden="false" Class="flex-1" InputClass="absolute mud-width-full mud-height-full overflow-hidden z-20" InputStyle="opacity:0"
                    @ondragenter="@SetDragClass" @ondragleave="@ClearDragClass" @ondragend="@ClearDragClass">
         <ButtonTemplate>
@@ -38,6 +39,7 @@
 @code {
     private long maxFileSize = 15000000; // set max filesize to 15MB.
     private bool alertHidden = true;
+    private bool progressHidden = true;
     private Severity alertSeverity = Severity.Success;
     private string alertText = string.Empty;
     private static string DefaultDragClass = "relative rounded-lg border-2 border-dashed pa-4 mt-4 mud-width-full mud-height-full z-10";
@@ -79,6 +81,12 @@
         {
             try
             {
+                if (!Directory.Exists(Path.Combine(Environment.ContentRootPath, "Filestore")))
+                {
+                    Directory.CreateDirectory(Path.Combine(Environment.ContentRootPath, "Filestore"));
+                }
+
+                progressHidden = false;
                 var trustedFileName = file.Name;
                 var path = Path.Combine(Environment.ContentRootPath, "Filestore", trustedFileName);
 
@@ -101,6 +109,10 @@
 
                 Logger.LogError($"Unable to upload file {file.Name}: {ex.Message}");
                 alertErrorText = alertErrorText + $"Unable to upload file {file.Name}: {ex.Message}\n";
+            }
+            finally
+            {
+                progressHidden = true;
             }
         }
 

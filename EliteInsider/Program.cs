@@ -25,6 +25,7 @@ builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuth
 
 // add our own database object services
 builder.Services.AddTransient<IRaidLogService, RaidLogService>();
+builder.Services.AddTransient<IUploadService, UploadService>();
 
 // add swagger openAPI features
 builder.Services.AddEndpointsApiExplorer();

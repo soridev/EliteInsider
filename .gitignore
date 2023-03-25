@@ -475,3 +475,11 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+# startup json's
+appsettings.Production.json
+
+# application filestore
+*.evtc
+*.zevtc
+*.evtc.zip

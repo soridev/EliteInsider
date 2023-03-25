@@ -1,8 +1,8 @@
 ﻿<AuthorizeView>
     <Authorized>
-        <a href="Identity/Account/Manage">Hello, @context.User.Identity?.Name!</a>
+        <MudLink class="px-3" Color="Color.Primary" Href="Identity/Account/Manage">Hello, @context.User.Identity?.Name!</MudLink>
         <form method="post" action="Identity/Account/Logout">
-            <button type="submit" class="nav-link btn btn-link">Log out</button>
+            <MudButton Variant="Variant.Text" Color="Color.Secondary" ButtonType="ButtonType.Submit">Log out</MudButton>
         </form>
     </Authorized>
     <NotAuthorized>

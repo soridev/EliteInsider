@@ -6,16 +6,16 @@
             <MudSnackbarProvider />
             <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
                 <NotAuthorized>
-                    <LoginRedirect/>
+                    <LayoutView Layout="@typeof(MainLayout)">
+                        <h1>Unauthorized.</h1>
+                        <p role="alert">You need to log in to access content.</p>
+                    </LayoutView>
                 </NotAuthorized>
             </AuthorizeRouteView>
             <FocusOnNavigate RouteData="@routeData" Selector="h1" />
         </Found>
         <NotFound>
-            <PageTitle>Not found</PageTitle>
-            <LayoutView Layout="@typeof(MainLayout)">
-                <p role="alert">You need to log in to access content.</p>
-            </LayoutView>
+            <h1>Page not found.</h1>
         </NotFound>
     </Router>
 </CascadingAuthenticationState>

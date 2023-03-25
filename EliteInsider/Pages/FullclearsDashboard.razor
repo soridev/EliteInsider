@@ -1,0 +1,212 @@
+﻿@page "/fullclears/dashboard"
+@attribute [Authorize]
+
+@using EliteInsider.Models;
+@using EliteInsider.Models.Converters;
+@using EliteInsider.Data;
+@using Plotly.Blazor.Traces.ScatterLib;
+@using Plotly.Blazor.LayoutLib;
+
+@using System.Diagnostics;
+
+@inject IRaidLogService LogService;
+
+<PageTitle>Fullclears</PageTitle>
+
+<h1>Fullclears</h1>
+
+<p>This page lets you inspect data about the guilds fullclears</p>
+
+<MudGrid>
+    <MudItem xs="3">
+        <MudAutocomplete T="GuildWeek" Label="Year and Week" @bind-Value="currentValue" SearchFunc="@Search1"
+                         CoerceText="@coerceText" CoerceValue="@coerceValue" MaxItems="null" ResetValueOnEmptyText="true"/>
+    </MudItem>
+    <MudItem xs="2">
+        <MudButton Variant="Variant.Filled" ButtonType="ButtonType.Button" Color="@Color.Primary" OnClick="UpdateChartClick" Style="margin-top: 15px;">Update Charts</MudButton>
+    </MudItem>
+    <MudItem xs="12" >
+        <PlotlyChart @bind-Config="fcLineconfig" @bind-Layout="fcLinelayout" @bind-Data="fcLineData" @ref="fcLineChart" ClickAction="TimeSegmentClicked"
+            AfterRender="async () => await SubscribeEvents()" />
+    </MudItem>
+    <MudItem xs="12">
+        <PlotlyChart @bind-Config="fcBarConfig" @bind-Layout="fcBarLayout" @bind-Data="fcBarData" @ref="fcBarChart"/>
+    </MudItem>
+</MudGrid>
+
+<MudScrollToTop>
+    <MudFab Color="Color.Tertiary" Icon="@Icons.Material.Filled.ArrowCircleUp" />
+</MudScrollToTop>
+
+@code {
+    // dropdown config
+    private bool resetValueOnEmptyText;
+    private bool coerceText;
+    private bool coerceValue;
+    private GuildWeek currentValue;
+    private List<GuildWeek> guildWeeks = new List<GuildWeek>();
+
+    // plotly fc line-chart config
+    PlotlyChart fcLineChart = new PlotlyChart();
+    Config fcLineconfig = new Config() { Responsive = true };
+    Layout fcLinelayout = new Layout()
+    {
+        AutoSize = true,
+        XAxis = new List<XAxis>() { new XAxis() { Color = "#ffffff" } },
+        YAxis = new List<YAxis>() { new YAxis() { ShowTickLabels = false, Color = "#ffffff" } },
+        Font = new Font() { Color = "#ffffff" },
+        PaperBgColor = "#373740",
+        PlotBgColor = "#373740",
+        Title = new Title() { Text = "Time Sections Overview" }
+    };
+    IList<ITrace> fcLineData = new List<ITrace>();
+
+    // plotly fc bar-chart config
+    PlotlyChart fcBarChart = new PlotlyChart();
+    Config fcBarConfig = new Config() { Responsive = true };
+    Layout fcBarLayout = new Layout()
+    {
+        AutoSize = true,
+        XAxis = new List<XAxis>() { new XAxis() { Color = "#ffffff" } },
+        YAxis = new List<YAxis>() { new YAxis() { Color = "#ffffff", Title = new Plotly.Blazor.LayoutLib.YAxisLib.Title() { Text = "Duration in Minutes" }}},
+        Font = new Font() { Color = "#ffffff" },
+        PaperBgColor = "#373740",
+        PlotBgColor = "#373740",
+        Title = new Title() { Text = "Wing Performance Overview" }
+    };
+    IList<ITrace> fcBarData = new List<ITrace>();
+
+    // fullclear data
+    List<GuildKillTime> gkts = new List<GuildKillTime>();
+
+    // load guild-weeks from backend service.
+    protected override async Task OnInitializedAsync()
+    {
+        guildWeeks = await LogService.GetGuildClearWeeksAsync("ZETA");
+        if(guildWeeks.Count > 0)
+        {
+            currentValue = guildWeeks.First();
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await UpdateChartClick();
+        }
+    }
+
+    // generic search function.
+    private async Task<IEnumerable<GuildWeek>> Search1(string value)
+    {
+        // In real life use an asynchronous function for fetching data from an api.
+        await Task.Delay(5);
+
+        // if text is null or empty, show complete list
+        if (string.IsNullOrEmpty(value))
+            return guildWeeks;
+        return guildWeeks.Where(x => x.YearWeek.ToString().Contains(value, StringComparison.InvariantCultureIgnoreCase));
+    }
+
+    private async Task UpdateChartClick()
+    {
+        if(currentValue != null)
+        {
+            await FetchFullclearData(currentValue);
+            await refreshGraphs();            
+        }
+    }
+
+    public async Task FetchFullclearData(GuildWeek guildweek)
+    {
+        gkts = await LogService.GetFullclearDataAsync(guildweek);
+    }
+
+    public void TimeSegmentClicked(object value, object label)
+    {
+        Debug.WriteLine(label.ToString());
+        Debug.WriteLine(value.ToString());
+    }
+
+    public async Task SubscribeEvents()
+    {
+        await fcLineChart.SubscribeClickEvent();
+    }
+
+    public async Task refreshGraphs()
+    {        
+        // update the data for the fc time section line-chart.
+        IList<ITrace> data = new List<ITrace>();
+
+        foreach(var item in gkts)
+        {
+            data.Add(new Scatter{
+                    Name = item.EncounterName,
+                    Mode = ModeFlag.Lines,
+                    X = new List<object>(){item.StartTime, item.EndTime},
+                    Y = new List<object>() { 10, 10 },
+                    Line = new Line() { Width = 25 }
+            });
+        }
+
+        fcLineData = data;
+
+        // update the data for the fc wing performance bar chart
+        data = new List<ITrace>();
+        Dictionary<int, DateTime> WingStartTimes = new Dictionary<int, DateTime>();
+        Dictionary<int, DateTime> WingEndTimes = new Dictionary<int, DateTime>();
+        Dictionary<int, string> WingNames = new Dictionary<int, string>();
+
+        foreach(var item in gkts)
+        {
+            // check start-times
+            if(WingStartTimes.Keys.Contains(item.RaidWing)){
+                if (WingStartTimes[item.RaidWing] > item.StartTime)
+                {
+                    WingStartTimes[item.RaidWing] = item.StartTime;
+                }
+            }
+            else
+            {
+                WingStartTimes.Add(item.RaidWing, item.StartTime);
+            }
+
+            // check end-times
+            if (WingEndTimes.Keys.Contains(item.RaidWing))
+            {
+                if(WingEndTimes[item.RaidWing] < item.EndTime)
+                {
+                    WingEndTimes[item.RaidWing] = item.EndTime;
+                }
+            }
+            else {
+                WingEndTimes.Add(item.RaidWing, item.EndTime);
+            }
+
+            // check wingnames
+            if (!WingNames.Keys.Contains(item.RaidWing))
+            {
+                WingNames.Add(item.RaidWing, item.WingName);
+            }
+        }
+
+        foreach(var item in WingStartTimes.Keys)
+        {
+            double totalTime = Math.Round((WingEndTimes[item] - WingStartTimes[item]).TotalMinutes, 2);
+
+            data.Add(new Bar()
+            {
+                X = new List<object> { WingNames[item] },
+                Y = new List<object> { totalTime },
+                Name = WingNames[item]
+            });
+        }
+
+        fcBarData = data;
+
+        StateHasChanged();
+        await fcLineChart.React();
+        await fcBarChart.React();
+    }
+}

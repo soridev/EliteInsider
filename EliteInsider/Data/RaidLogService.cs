@@ -77,6 +77,8 @@ namespace EliteInsider.Data
                 var gkt = await (from gl in _context.GuildLogs 
                             join rkt in _context.RaidKillTimes
                             on gl.LogId equals rkt.LogId where gl.YearWeek == guildweek.YearWeek
+                            join re in _context.RaidEncounters
+                            on rkt.EncounterName.Replace(" CM", "") equals re.EncounterName
                             select new
                             {
                                 EncounterName = rkt.EncounterName,
@@ -85,6 +87,9 @@ namespace EliteInsider.Data
                                 KillDurationSeconds = rkt.KillDurationSeconds,
                                 Success = rkt.Success,
                                 CM = rkt.CM,
+                                RaidWing = re.RaidWing,
+                                BossPosition = re.BossPosition,
+                                WingName = re.WingName,
                                 LinkToUpload = rkt.LinkToUpload
                             }).ToListAsync();
 
@@ -98,6 +103,9 @@ namespace EliteInsider.Data
                         KillDurationSeconds = e.KillDurationSeconds,
                         Success = e.Success,
                         CM = e.CM,
+                        RaidWing = e.RaidWing,
+                        BossPosition = e.BossPosition,
+                        WingName = e.WingName,
                         LinkToUpload = e.LinkToUpload
                     });
                 }

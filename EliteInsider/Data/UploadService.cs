@@ -125,7 +125,7 @@ namespace EliteInsider.Data
                     durationSeconds = 1;
                 }
 
-                // create database objects.
+                // create raid kill time.
                 RaidKillTime rkt = new RaidKillTime();
                 rkt.LogId = logid;
                 rkt.EncounterName = jsonData.fightName;
@@ -136,15 +136,44 @@ namespace EliteInsider.Data
                 rkt.Success = jsonData.success;
                 rkt.CM = jsonData.isCM;
                 rkt.LinkToUpload = linkToUpload;
+                
+                // create player info.
+                List<PlayerInfo> rktPlayers = new List<PlayerInfo>();
+                foreach (var player in jsonData.players)
+                {
+                    var downedMechanic = jsonData.mechanics.Find(x => x.name == "Downed");
+                    var deadMechanic = jsonData.mechanics.Find(x => x.name == "Dead");
+
+                    PlayerInfo playerInfo = new PlayerInfo();
+                    playerInfo.LogId = logid;
+                    playerInfo.AccountName = player.account;
+                    playerInfo.CharacterName = player.name;
+                    playerInfo.Profession = player.profession;
+                    playerInfo.TargetDps = player.dpsTargets[0][0].dps;
+                    playerInfo.TotalCC = player.dpsTargets[0][0].breakbarDamage;
+
+                    if (downedMechanic is not null)
+                    {
+                        playerInfo.Downstates = downedMechanic.mechanicsData.FindAll(x => x.actor == player.name).Count();
+                    }
+                    if (deadMechanic is not null)
+                    {
+                        playerInfo.Died = deadMechanic.mechanicsData.Exists(x => x.actor == player.name);
+                    }
+                    
+                    rktPlayers.Add(playerInfo);
+                }
 
                 try
                 {
                     _context.Add(rkt);
+                    _context.AddRange(rktPlayers);
                     _context.SaveChanges();
                 }
                 catch(Exception entityError)
                 {
                     _context.Remove(rkt);
+                    _context.RemoveRange(rktPlayers);
                     throw entityError.InnerException;
                 }
             }

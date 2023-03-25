@@ -45,14 +45,15 @@
     private static string DefaultDragClass = "relative rounded-lg border-2 border-dashed pa-4 mt-4 mud-width-full mud-height-full z-10";
     private string DragClass = DefaultDragClass;
     private List<string> fileNames = new List<string>();
-    private IReadOnlyList<IBrowserFile> uploadFileList = new List<IBrowserFile>();
+    private IReadOnlyList<IBrowserFile> inputFiles = new List<IBrowserFile>();
 
     private void OnInputFileChanged(InputFileChangeEventArgs e)
     {
         ClearDragClass();
-        uploadFileList = e.GetMultipleFiles();
-        foreach (var file in uploadFileList)
+        var files = e.GetMultipleFiles(maximumFileCount: 100);
+        foreach (var file in files)
         {
+            inputFiles = files;
             fileNames.Add(file.Name);
         }
     }
@@ -65,7 +66,6 @@
     private async Task Clear()
     {
         fileNames.Clear();
-        uploadFileList = new List<IBrowserFile>();
         ClearDragClass();
         await Task.Delay(100);
     }
@@ -76,8 +76,7 @@
         Snackbar.Add("Starting File Upload.", Severity.Info);
         string alertErrorText = string.Empty;
 
-
-        foreach(var file in uploadFileList)
+        foreach(var file in inputFiles)
         {
             try
             {
@@ -114,12 +113,14 @@
             {
                 progressHidden = true;
             }
+
         }
+
 
         // file upload done, show result.
         if (string.IsNullOrEmpty(alertErrorText))
         {
-            alertText = $"Successfuly uploaded {uploadFileList.Count} files.";
+            alertText = $"Successfuly uploaded {inputFiles.Count} files.";
             alertSeverity = Severity.Success;
         }
         else

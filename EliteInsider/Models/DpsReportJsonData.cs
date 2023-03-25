@@ -37,7 +37,7 @@
     {
         public string? name { get; set; }
         public string? description { get; set; }
-        public List<DpsReportMechanicsData> mechanicsDatas { get; set; } = new List<DpsReportMechanicsData>();
+        public List<DpsReportMechanicsData> mechanicsData { get; set; } = new List<DpsReportMechanicsData>();
     }
 
     public class DpsReportMechanicsData

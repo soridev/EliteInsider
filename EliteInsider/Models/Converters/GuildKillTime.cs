@@ -1,4 +1,6 @@
-﻿namespace EliteInsider.Models.Converters
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace EliteInsider.Models.Converters
 {
     public class GuildKillTime
     {
@@ -8,6 +10,9 @@
         public double KillDurationSeconds { get; set; }
         public bool Success { get; set; }
         public bool CM { get; set; }
+        public int RaidWing { get; set; }
+        public int BossPosition { get; set; }
+        public string WingName { get; set; }
         public string LinkToUpload { get; set; }
     }
 }

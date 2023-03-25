@@ -15,6 +15,9 @@
 
 <p>This page lets you upload you arcdps logfiles to register them on <MudLink Target="_blank" Href="https://dps.report">dps.report</MudLink> and in the Elite Insider backend.</p>
 
+<!-- temporary message -->
+<MudAlert Severity="Severity.Warning">There is currently an issue with uploading. Each time you drag an drop it overrides the previously selected logs. So you have to drag and drop, then press upload, then drag and drop again for the next logs.</MudAlert>
+
 <MudAlert hidden="@alertHidden" Severity="@alertSeverity" id="upload-alert" ShowCloseIcon="true" CloseIconClicked="HideAlert">@alertText</MudAlert>
 
 <MudStack Style="width: 100%">

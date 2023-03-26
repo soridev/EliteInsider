@@ -9,5 +9,6 @@ namespace EliteInsider.Data
         Task<RaidKillTime?> GetRaidKillTimeAsync(string logId);
         Task<List<GuildWeek>> GetGuildClearWeeksAsync(string guildName);
         Task<List<GuildKillTime>> GetFullclearDataAsync(GuildWeek guildweek);
+        Task<List<PersonalBest>> GetPersonalBestsAsync();
     }
 }

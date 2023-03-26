@@ -1,10 +1,44 @@
 ﻿@page "/fullclears/personal-best"
 @attribute [Authorize]
 
+@using EliteInsider.Models;
+@using EliteInsider.Models.Converters;
+@using EliteInsider.Data;
+
+@inject IRaidLogService LogService;
+
 <h1>Personal Best</h1>
 
 <p>This page shows the guilds personal best times.</p>
 
-@code {
+<MudGrid>
+    @foreach (var item in personalBests)
+    {
+        <MudItem xs="3">
+            <MudCard>
+                <MudCardContent>
+                    <table width="100%">
+                        <tr>
+                            <td style="white-space: nowrap;">
+                                <MudImage Src="@item.BossImage" Height="64" Width="64"></MudImage>
+                            </td>
+                            <td style="white-space: nowrap;" width="99%">
+                                <MudText Typo="Typo.h6" Color="Color.Tertiary" Align="Align.Center">@item.EncounterName</MudText>
+                                <MudText Typo="Typo.body1" Align="Align.Center">@item.GetDurationToString()</MudText>
+                            </td>
+                        </tr>
+                    </table>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    }
+</MudGrid>
 
+@code {
+    public IReadOnlyList<EliteInsider.Models.Converters.PersonalBest> personalBests = new List<EliteInsider.Models.Converters.PersonalBest>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        personalBests = await LogService.GetPersonalBestsAsync();
+    }
 }

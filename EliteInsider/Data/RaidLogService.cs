@@ -118,5 +118,54 @@ namespace EliteInsider.Data
                 throw ex;
             }
         }
+
+        public async Task<List<PersonalBest>> GetPersonalBestsAsync()
+        {
+            try
+            {
+                var query = await (from rkt in _context.RaidKillTimes
+                                   join gl in _context.GuildLogs
+                                   on rkt.LogId equals gl.LogId
+                                   join re in _context.RaidEncounters
+                                   on rkt.EncounterName.Replace(" CM", "") equals re.EncounterName
+                                   where rkt.Success
+                                   select new PersonalBest
+                                   {
+                                       EncounterName = rkt.EncounterName,
+                                       Duration = rkt.EndTime - rkt.StartTime,
+                                       LinkToUpload = rkt.LinkToUpload,
+                                       RaidWing = re.RaidWing,
+                                       BossPosition = re.BossPosition
+                                   }).ToListAsync();
+
+                var groupedResult = query.GroupBy(bp => bp.EncounterName).Select(g => new
+                {
+                    g.Key,
+                    MinDuration = g.Min(bp => bp.Duration)
+                });
+
+                var finalResult = (from rkt in query
+                                   join gr in groupedResult
+                                   on
+                                   new { EncounterName = rkt.EncounterName, Duration = rkt.Duration } equals
+                                   new { EncounterName = gr.Key, Duration = gr.MinDuration}
+                                   select new PersonalBest
+                                   {
+                                       EncounterName = rkt.EncounterName,
+                                       Duration = rkt.Duration,
+                                       LinkToUpload= rkt.LinkToUpload,
+                                       RaidWing = rkt.RaidWing,
+                                       BossPosition = rkt.BossPosition,
+                                       BossImage = $"images/boss-icons/{rkt.EncounterName.Replace(" CM", "").Replace(" ", "-").ToLower()}.png"
+                                   }).ToList();
+
+                return finalResult.OrderBy(x => x.RaidWing).ThenBy(n => n.BossPosition).ToList();
+            }
+            catch (Exception ex)
+            {
+                Debug.Write(ex.Message);
+                throw ex;
+            }
+        }
     }
 }

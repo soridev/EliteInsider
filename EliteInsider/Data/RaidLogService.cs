@@ -132,7 +132,7 @@ namespace EliteInsider.Data
                                    select new PersonalBest
                                    {
                                        EncounterName = rkt.EncounterName,
-                                       Duration = rkt.EndTime - rkt.StartTime,
+                                       Duration = TimeSpan.FromSeconds(rkt.KillDurationSeconds),
                                        LinkToUpload = rkt.LinkToUpload,
                                        RaidWing = re.RaidWing,
                                        BossPosition = re.BossPosition
@@ -159,6 +159,7 @@ namespace EliteInsider.Data
                                        BossImage = $"images/boss-icons/{rkt.EncounterName.Replace(" CM", "").Replace(" ", "-").ToLower()}.png"
                                    }).ToList();
 
+                finalResult = finalResult.GroupBy(x => x.EncounterName).Select(y => y.First()).ToList();
                 return finalResult.OrderBy(x => x.RaidWing).ThenBy(n => n.BossPosition).ToList();
             }
             catch (Exception ex)

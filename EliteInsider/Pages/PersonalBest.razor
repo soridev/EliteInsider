@@ -5,6 +5,7 @@
 @using EliteInsider.Models.Converters;
 @using EliteInsider.Data;
 
+@inject NavigationManager UriHelper
 @inject IRaidLogService LogService;
 
 <h1>Personal Best</h1>
@@ -15,7 +16,7 @@
     @foreach (var item in personalBests)
     {
         <MudItem xs="3">
-            <MudCard>
+            <MudCard style="cursor: pointer" @onclick="@(() => UriHelper.NavigateTo(item.LinkToUpload))">
                 <MudCardContent>
                     <table width="100%">
                         <tr>
@@ -36,6 +37,11 @@
 
 @code {
     public IReadOnlyList<EliteInsider.Models.Converters.PersonalBest> personalBests = new List<EliteInsider.Models.Converters.PersonalBest>();
+
+    async Task OnCardClick(EliteInsider.Models.Converters.PersonalBest personalBest)
+    {
+        UriHelper.NavigateTo(personalBest.LinkToUpload);
+    }
 
     protected override async Task OnInitializedAsync()
     {

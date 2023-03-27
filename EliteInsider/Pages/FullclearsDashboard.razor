@@ -19,7 +19,7 @@
 <MudGrid>
     <MudItem xs="3">
         <MudAutocomplete T="GuildWeek" Label="Year and Week" @bind-Value="currentValue" SearchFunc="@Search1"
-                         CoerceText="@coerceText" CoerceValue="@coerceValue" MaxItems="null" ResetValueOnEmptyText="true"/>
+                         CoerceText="@coerceText" CoerceValue="@coerceValue" MaxItems="null" ResetValueOnEmptyText="true" Strict="false"/>
     </MudItem>
     <MudItem xs="2">
         <MudButton Variant="Variant.Filled" ButtonType="ButtonType.Button" Color="@Color.Primary" OnClick="UpdateChartClick" Style="margin-top: 15px;">Update Charts</MudButton>

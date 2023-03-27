@@ -25,5 +25,11 @@ namespace EliteInsider.Models
         public bool CM { get; set; }
         [Column("link_to_upload")]
         public string? LinkToUpload { get; set; }
-    }
+
+        public string GetKillDurationFormated()
+        {
+            TimeSpan tS = TimeSpan.FromSeconds(this.KillDurationSeconds);
+            return $"{tS.Minutes}m {tS.Seconds}s {tS.Milliseconds}ms";
+        }
+    }    
 }

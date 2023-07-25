@@ -44,8 +44,7 @@ namespace EliteInsider.Data
         {
             try
             {
-                var groupedResult = await _context.GuildLogs.Where(r => r.GuildName == guildName)
-                    .GroupBy(r => new { r.GuildName, r.YearWeek }).ToListAsync();
+                var groupedResult = await _context.GuildLogs.GroupBy(r => new { r.GuildName, r.YearWeek }).ToListAsync();
 
                 groupedResult = groupedResult.OrderByDescending(r => r.Key.YearWeek).ToList();
 
@@ -79,6 +78,7 @@ namespace EliteInsider.Data
                             on gl.LogId equals rkt.LogId where gl.YearWeek == guildweek.YearWeek
                             join re in _context.RaidEncounters
                             on rkt.EncounterName.Replace(" CM", "") equals re.EncounterName
+                            where gl.GuildName == guildweek.GuildName
                             select new
                             {
                                 EncounterName = rkt.EncounterName,

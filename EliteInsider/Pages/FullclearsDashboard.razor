@@ -16,25 +16,102 @@
 
 <p>This page lets you inspect data about the guilds fullclears</p>
 
-<MudGrid>
-    <MudItem xs="3">
-        <MudAutocomplete T="GuildWeek" Label="Year and Week" @bind-Value="currentValue" SearchFunc="@Search1"
-                         CoerceText="@coerceText" CoerceValue="@coerceValue" MaxItems="null" ResetValueOnEmptyText="true" Strict="false"/>
-    </MudItem>
-    <MudItem xs="2">
-        <MudButton Variant="Variant.Filled" ButtonType="ButtonType.Button" Color="@Color.Primary" OnClick="UpdateChartClick" Style="margin-top: 15px;">Update Charts</MudButton>
-    </MudItem>
-    <MudItem xs="12" >
-        <PlotlyChart @bind-Config="fcLineconfig" @bind-Layout="fcLinelayout" @bind-Data="fcLineData" @ref="fcLineChart" ClickAction="TimeSegmentClicked"
-            AfterRender="async () => await SubscribeEvents()" />
-    </MudItem>
-    <MudItem xs="12">
-        <PlotlyChart @bind-Config="fcBarConfig" @bind-Layout="fcBarLayout" @bind-Data="fcBarData" @ref="fcBarChart"/>
-    </MudItem>
-</MudGrid>
+
+<MudContainer Class="mt-3 px-8" MaxWidth="MaxWidth.False">
+    <MudGrid>
+        <!-- Row one with week selector. -->
+        <MudItem xs="3">
+            <MudAutocomplete T="GuildWeek" Label="Year and Week" @bind-Value="currentValue" SearchFunc="@Search1"
+                             CoerceText="@coerceText" CoerceValue="@coerceValue" MaxItems="null" ResetValueOnEmptyText="true" Strict="false" />
+        </MudItem>        
+        <MudItem xs="2">
+            <MudButton Variant="Variant.Filled" ButtonType="ButtonType.Button" Color="@Color.Primary" OnClick="UpdateChartClick" Style="margin-top: 15px;">Update Charts</MudButton>
+        </MudItem>
+        <MudItem xs="12"></MudItem>
+
+        <!-- Row two with KPI data. -->
+        <MudItem xs="12" sm="6" md="4">
+            <MudPaper Elevation="2" Class="pa-4">
+                <MudText Typo="Typo.h6" Align="Align.Center">Total Clear Time</MudText>
+                <MudText Typo="Typo.body1" Color="Color.Tertiary" Align="Align.Center">2 hours 45 minutes</MudText>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" sm="6" md="4">
+            <MudPaper Elevation="2" Class="pa-4">
+                <MudText Typo="Typo.h6" Align="Align.Center">Compared to last clear</MudText>
+                <MudText Typo="Typo.body1" Color="Color.Secondary" Align="Align.Center">+ 11 minutes</MudText>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" sm="12" md="4">
+            <MudPaper Elevation="2" Class="pa-4">
+                <MudText Typo="Typo.h6" Align="Align.Center">New personal best?</MudText>
+                <MudText Typo="Typo.body1" Color="Color.Secondary" Align="Align.Center">No</MudText>
+            </MudPaper>
+        </MudItem>
+
+        <!-- Row 3 with fullclear section chart. -->
+        <MudItem xs="12">
+            <PlotlyChart class="mud-elevation-2" @bind-Config="fcLineconfig" @bind-Layout="fcLinelayout" @bind-Data="fcLineData" @ref="fcLineChart"
+                ClickAction="TimeSegmentClicked" AfterRender="async () => await SubscribeEvents()" />
+        </MudItem>
+
+        <!-- Row 4 with wing duration bar chart. -->
+        <MudItem xs="12" sm="4">
+            <MudGrid>
+                <MudItem xs="12">
+                    <MudPaper Elevation="2" Class="pa-4" Style="height: 238px;">
+                        <MudText Typo="Typo.h6" Align="Align.Center">DPS Ranking</MudText>
+                        <MudSimpleTable Dense="true" Style="overflow-x: auto;" Bordered="true">
+                            <thead>
+                                <th>Rank</th>
+                                <th>Account Name</th>
+                                <th>AVG DPS</th>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>Daxxed.1234</td>
+                                    <td>21.325</td>
+                                </tr>
+                                <tr>
+                                    <td>2</td>
+                                    <td>Daxxed.1234</td>
+                                    <td>21.325</td>
+                                </tr>
+                                <tr>
+                                    <td>3</td>
+                                    <td>Daxxed.1234</td>
+                                    <td>21.325</td>
+                                </tr>
+                            </tbody>
+                        </MudSimpleTable>
+                    </MudPaper>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudPaper Elevation="2" Class="pa-4" Style="height: 238px;">
+                        <MudText Typo="Typo.h6" Align="Align.Center">Dont know yet</MudText>
+                    </MudPaper>
+                </MudItem>
+            </MudGrid>
+        </MudItem>
+        <MudItem xs="12" sm="8">
+            <div class="mud-elevation-2">
+                <MudCarousel Class="mud-width-full" ShowArrows="true" ShowBullets="true" EnableSwipeGesture="true" TData="object" Style="height: 500px;" AutoCycle="false">
+                    <MudCarouselItem Transition="transition">
+                        <PlotlyChart @bind-Config="fcBarConfig" @bind-Layout="fcBarLayout" @bind-Data="fcBarData" @ref="fcBarChart" />
+                    </MudCarouselItem>
+                    <MudCarouselItem Transition="transition">
+                        <PlotlyChart @bind-Config="fcBarConfig" @bind-Layout="fcBarLayout" @bind-Data="fcBarData" @ref="fcBarChart" />
+                    </MudCarouselItem>
+                </MudCarousel>
+            </div>
+        </MudItem>        
+    </MudGrid>
+</MudContainer>
+<MudSpacer></MudSpacer>
 
 <MudScrollToTop>
-    <MudFab Color="Color.Tertiary" Icon="@Icons.Material.Filled.ArrowCircleUp" />
+    <MudFab Color="Color.Tertiary" StartIcon="@Icons.Material.Filled.ArrowCircleUp" />
 </MudScrollToTop>
 
 @code {
@@ -44,6 +121,7 @@
     private bool coerceValue;
     private GuildWeek currentValue;
     private List<GuildWeek> guildWeeks = new List<GuildWeek>();
+    private MudBlazor.Transition transition = MudBlazor.Transition.Slide;
 
     // plotly fc line-chart config
     PlotlyChart fcLineChart = new PlotlyChart();
@@ -51,12 +129,12 @@
     Layout fcLinelayout = new Layout()
     {
         AutoSize = true,
-        XAxis = new List<XAxis>() { new XAxis() { Color = "#ffffff" } },
+        XAxis = new List<XAxis>() { new XAxis() { Color = "#ffffff"} },
         YAxis = new List<YAxis>() { new YAxis() { ShowTickLabels = false, Color = "#ffffff" } },
         Font = new Font() { Color = "#ffffff" },
         PaperBgColor = "#373740",
         PlotBgColor = "#373740",
-        Title = new Title() { Text = "Time Sections Overview" }
+        Title = new Title() { Text = "Fullclear time sections" }
     };
     IList<ITrace> fcLineData = new List<ITrace>();
 
@@ -66,12 +144,13 @@
     Layout fcBarLayout = new Layout()
     {
         AutoSize = true,
-        XAxis = new List<XAxis>() { new XAxis() { Color = "#ffffff" } },
+        ShowLegend = true,
+        XAxis = new List<XAxis>() { new XAxis() { Color = "#ffffff"} },
         YAxis = new List<YAxis>() { new YAxis() { Color = "#ffffff", Title = new Plotly.Blazor.LayoutLib.YAxisLib.Title() { Text = "Duration in Minutes" }}},
         Font = new Font() { Color = "#ffffff" },
         PaperBgColor = "#373740",
         PlotBgColor = "#373740",
-        Title = new Title() { Text = "Wing Performance Overview" }
+        Title = new Title() { Text = "Total duration per wing" }
     };
     IList<ITrace> fcBarData = new List<ITrace>();
 
@@ -140,12 +219,14 @@
 
         foreach(var item in gkts)
         {
+            var timediff = item.EndTime - item.StartTime;
             data.Add(new Scatter{
                     Name = item.EncounterName,
                     Mode = ModeFlag.Lines,
                     X = new List<object>(){item.StartTime, item.EndTime},
                     Y = new List<object>() { 10, 10 },
-                    Line = new Line() { Width = 25 }
+                    Line = new Line() { Width = 25 },
+                    Text = $"{timediff.Minutes}m {timediff.Seconds}s"
             });
         }
 
@@ -195,10 +276,11 @@
             double totalTime = Math.Round((WingEndTimes[item] - WingStartTimes[item]).TotalMinutes, 2);
 
             data.Add(new Bar()
-            {
-                X = new List<object> { WingNames[item] },
-                Y = new List<object> { totalTime },
-                Name = WingNames[item]
+                {
+                    X = new List<object> { WingNames[item] },
+                    Y = new List<object> { totalTime },
+                    Name = WingNames[item],
+                    Text = $"{totalTime.ToString()}min."
             });
         }
 

@@ -1,0 +1,115 @@
+﻿@page "/LandingPage"
+@attribute [Authorize]
+
+@inject NavigationManager UriHelper
+
+
+<MudContainer Class="mt-16">
+    <MudText Typo="Typo.h3" Align="Align.Center" GutterBottom="true">Welcome to Elite Insider</MudText>
+    <MudText Align="Align.Center">This application enables you to analyse details of your guilds logs. It focuses on fullclear group performance.</MudText>
+
+    <MudGrid Class="mt-8">
+        <MudItem xs="12" sm="6" md="4">
+            <MudCard Elevation="25" Class="rounded-lg pb-4">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h5" Align="Align.Center">Analyze</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent>
+                    <div class="d-flex justify-center">
+                        <MudIcon Icon="@Icons.Material.Filled.AutoGraph" Size="Size.Large"></MudIcon>
+                    </div>
+                    <MudList Class="mx-auto mt-4" Style="width:300px;">
+                        <MudListItem Icon="@Icons.Material.Filled.Bookmark" IconColor="Color.Primary">
+                            View your fullclear timeline and boss performance.
+                        </MudListItem>
+                        <MudListItem Icon="@Icons.Material.Filled.Bookmark" IconColor="Color.Secondary">
+                            Analyze the number of pulls needed.
+                        </MudListItem>
+                        <MudListItem Icon="@Icons.Material.Filled.Bookmark" IconColor="Color.Tertiary">
+                            Compare your fullclears with each other.
+                        </MudListItem>
+                    </MudList>
+                </MudCardContent>
+                <MudCardActions Class="d-flex justify-center">
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large" Style="width:50%;" OnClick="OnAnalyzeClick">Learn More</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+        <MudItem xs="12" sm="6" md="4">
+            <MudCard Elevation="25" Class="rounded-lg pb-4">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h5" Align="Align.Center">Upload</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent>
+                    <div class="d-flex justify-center">
+                        <MudIcon Icon="@Icons.Material.Filled.Upload" Size="@Size.Large"></MudIcon>
+                    </div>
+                    <MudList Class="mx-auto mt-4" Style="width:300px;">
+                        <MudListItem Icon="@Icons.Material.Filled.Bookmark" IconColor="Color.Primary">
+                            Upload your guilds logs.
+                        </MudListItem>
+                        <MudListItem Icon="@Icons.Material.Filled.Bookmark" IconColor="Color.Secondary">
+                            Automatically upload mid clear using the Elite-Insider <MudLink Target="_blank" Href="https://github.com/soridev/gw2-rpt-client">Client</MudLink>
+                        </MudListItem>
+                        <MudListItem Icon="@Icons.Material.Filled.Bookmark" IconColor="Color.Tertiary">
+                            Live update your clear information on discord.
+                        </MudListItem>
+                    </MudList>
+                </MudCardContent>
+                <MudCardActions Class="d-flex justify-center">
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large" Style="width:50%;" OnClick="OnUploadClick">Learn More</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+        <MudItem xs="12" sm="12" md="4">
+            <MudCard Elevation="25" Class="rounded-lg pb-4">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h5" Align="Align.Center">Log Management</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent>
+                    <div class="d-flex justify-center">
+                        <MudIcon Icon="@Icons.Material.Filled.ViewList" Size="@Size.Large"></MudIcon>
+                    </div>
+                    <MudList Class="mx-auto mt-4" Style="width:300px;">
+                        <MudListItem Icon="@Icons.Material.Filled.Bookmark" IconColor="Color.Primary">
+                            View all of your uploaded logs.
+                        </MudListItem>
+                        <MudListItem Icon="@Icons.Material.Filled.Bookmark" IconColor="Color.Secondary">
+                            Filter or search quickly trough your logs.
+                        </MudListItem>
+                        <MudListItem Icon="@Icons.Material.Filled.Bookmark" IconColor="Color.Tertiary">
+                            Delete or hide logs you want to exclude.
+                        </MudListItem>
+                    </MudList>
+                </MudCardContent>
+                <MudCardActions Class="d-flex justify-center">
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large" Style="width:50%;" OnClick="OnLogMgmtClick">Learn More</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
+
+@code {
+    void OnAnalyzeClick()
+    {
+        UriHelper.NavigateTo("/fullclears/dashboard");
+    }
+
+    void OnUploadClick()
+    {
+        UriHelper.NavigateTo("/upload");
+    }
+
+    void OnLogMgmtClick()
+    {
+        UriHelper.NavigateTo("/logregistry");
+    }
+}
+
